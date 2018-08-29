@@ -69,6 +69,9 @@ mminfo -q volume=$Volume -r client | sort -u |\
         nsrck -L7 -t "$SaveTime" $client
     done
 
+# run post nsrdr scripts
+for i in `find /postdr -name '*.sh' | sort -n`; do $i ; done
+
 # reset NMC administrator password
 newPassword=$(grep EMC_LOCALADMIN_PASSWORD /authc_configure.resp | cut -d'=' -f2)
 cp /opt/nsr/authc-server/scripts/authc-local-config.json.template /nsr/authc/conf/authc-local-config.json
@@ -78,12 +81,6 @@ chmod 755 /nsr/authc/conf/authc-local-config.json
 /etc/init.d/gst stop; /etc/init.d/networker stop
 sleep 3
 /etc/init.d/networker start; /etc/init.d/gst start
-sleep 40
-#cat /nsr/authc/logs/authc-server.log
-nsrauthtrust -H localhost -P 9090
-nsraddadmin -H localhost -P 9090
-#authc_mgmt -u administrator -p $newPassword -e find-all-users
-
 }
 
 ########
@@ -124,14 +121,18 @@ fi
 # this allows to restart a stopped container without losing state
 nsrmm | grep mounted | grep -q $Volume || bootstrap $BootStrapInfo
 
-# Find out to which pool our volume belongs
-# Recovery will be restricted to filesets in this pool
-Pool=$(mmpool $Volume | grep ^$Volume | cut -f2 -d ' ')
-
 # Listen for incoming recover requests 
 # use socat in stead of netcat casue the latter
 # does not behave consistently between linux distributions
 wait_for_networker_startup
+
+#add trust to auth service
+nsrauthtrust -H localhost -P 9090
+nsraddadmin -H localhost -P 9090
+
+# Find out to which pool our volume belongs
+# Recovery will be restricted to filesets in this pool
+Pool=$(mmpool $Volume | grep ^$Volume | cut -f2 -d ' ')
 
 echo "$HOSTNAME is open for recovery"
 echo "Listening on $(expr match "$RecoverySocket" '\([^,]\+\)')"

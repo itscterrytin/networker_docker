@@ -1,4 +1,4 @@
-# docker-networker
+## docker-networker
 
 EMC networker server instance for Testing.
 
@@ -8,7 +8,7 @@ EMC networker server instance for Testing.
   - a simple unix socket interface which abstracts away the recovery command syntax.
 
 The container is built from a standard Centos base image, hence building and
-running the container simulates a Bare Metal Restore scenario.
+running the container simulates running networker in Bare Metal.
 
 Given
 - a backup device containing regular backups and one or more bootstrap backups, accessible from within a docker container.
@@ -20,10 +20,12 @@ running this container will:
 - recover a subset of the server resources needed for the recovery tests
 - recover the client resources from the bootstrap
 - restore the client indexes
+- run post nsrdr scripts
 - starts listening on a socket for recovery requests
 
 After an initial run, the container can be stopped and started as needed, while
 keeping the media database.
+Daily bootstrap backup to remote device is recommended in case of re-initializing container.
 
 ## Usage
 
@@ -38,12 +40,14 @@ docker run -d \
 --name networker-test-dr \
 -h backupserver.example.com \
 -v /root/bootstrapdisk1:/bootstrapdevice \
+-v /root/docker-networker-rt/postdr:/postdr \
 -v /root/workspace:/recovery_area \
 -p 9000-9001:9000-9001 \
 -p 7937-7946:7937-7946 \
 docker-networker:latest \
 4251920743,bootstrapdisk1
 ```
+If unable to find bootstrap, starting container is same as fresh installation.
 
 ### Recover a file on the host where the container is running
 
@@ -72,7 +76,5 @@ docker run --name "networker-test-recover" -h client1.example.com -v /root/works
 
 ```
 
-There are security implications. It is degined to run on a secured host.
+# There are security implications. It is degined to run on a secured host.
 
-
-### Thanks https://github.com/viaacode/docker-networker-rt where Most info was referred from
