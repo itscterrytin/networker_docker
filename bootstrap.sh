@@ -55,7 +55,7 @@ nsradmin -i /mask_devices.nsradmin
 # Re-enable and mount our Disaster Recovery Device (read only)
 nsradmin <<EOF
 . name:$Device
-update enabled:Yes
+update enabled:Yes;read only:No
 y
 EOF
 
@@ -78,8 +78,7 @@ chmod 755 /nsr/authc/conf/authc-local-config.json
 /etc/init.d/gst stop; /etc/init.d/networker stop
 sleep 3
 /etc/init.d/networker start; /etc/init.d/gst start
-wait_for_networker_startup
-
+sleep 40
 #cat /nsr/authc/logs/authc-server.log
 nsrauthtrust -H localhost -P 9090
 nsraddadmin -H localhost -P 9090

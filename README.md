@@ -37,10 +37,10 @@ The hostname of the container MUST be the same as the hostname of the original n
 docker run -d \
 --name networker-test-dr \
 -h backupserver.example.com \
--v /root/clone_device:/bootstrapdevice \
+-v /root/bootstrapdisk1:/bootstrapdevice \
 -v /root/workspace:/recovery_area \
--p 192.168.107.60:9000-9001:9000-9001 \
--p 192.168.107.60:7937-7946:7937-7946 \
+-p 9000-9001:9000-9001 \
+-p 7937-7946:7937-7946 \
 docker-networker:latest \
 4251920743,bootstrapdisk1
 ```
