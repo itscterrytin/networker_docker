@@ -1,0 +1,7 @@
+create type: NSR device; 
+name: bootstrapdisk1; 
+device access information: "nfsserver:/nfs/bootstrapdisk1";
+media family: disk;
+media type: adv_file;
+enabled: Yes; 
+read only: yes
